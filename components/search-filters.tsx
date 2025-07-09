@@ -1,110 +1,71 @@
 "use client"
 
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { X } from "lucide-react"
-import { pokemonSets, cardRarities, cardConditions } from "@/lib/schema"
+import { Search } from "lucide-react"
+import type { PokemonCard } from "@/lib/types"
 
 interface SearchFiltersProps {
   searchTerm: string
   onSearchChange: (value: string) => void
-  filters: {
-    set: string
-    rarity: string
-    condition: string
-  }
-  onFiltersChange: (filters: { set: string; rarity: string; condition: string }) => void
+  selectedSet: string
+  onSetChange: (value: string) => void
+  selectedRarity: string
+  onRarityChange: (value: string) => void
+  cards: PokemonCard[]
 }
 
-export function SearchFilters({ searchTerm, onSearchChange, filters, onFiltersChange }: SearchFiltersProps) {
-  const clearFilters = () => {
-    onFiltersChange({ set: "", rarity: "", condition: "" })
-    onSearchChange("")
-  }
-
-  const hasActiveFilters = searchTerm || Object.values(filters).some(Boolean)
+export function SearchFilters({
+  searchTerm,
+  onSearchChange,
+  selectedSet,
+  onSetChange,
+  selectedRarity,
+  onRarityChange,
+  cards,
+}: SearchFiltersProps) {
+  const uniqueSets = Array.from(new Set(cards.map((card) => card.set))).sort()
+  const uniqueRarities = Array.from(new Set(cards.map((card) => card.rarity))).sort()
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Search & Filter</CardTitle>
-          {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={clearFilters}>
-              <X className="w-4 h-4 mr-1" />
-              Clear
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <Label htmlFor="search">Search Cards</Label>
-          <Input
-            id="search"
-            placeholder="Search by name..."
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-          />
-        </div>
+    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+        <Input
+          placeholder="Search cards..."
+          value={searchTerm}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="pl-10 w-full sm:w-64"
+        />
+      </div>
 
-        <div>
-          <Label htmlFor="set-filter">Set</Label>
-          <Select value={filters.set} onValueChange={(value) => onFiltersChange({ ...filters, set: value })}>
-            <SelectTrigger>
-              <SelectValue placeholder="All sets" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All sets</SelectItem>
-              {pokemonSets.map((set) => (
-                <SelectItem key={set.value} value={set.value}>
-                  {set.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <Select value={selectedSet} onValueChange={onSetChange}>
+        <SelectTrigger className="w-full sm:w-48">
+          <SelectValue placeholder="All Sets" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="allSets">All Sets</SelectItem>
+          {uniqueSets.map((set) => (
+            <SelectItem key={set} value={set}>
+              {set}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-        <div>
-          <Label htmlFor="rarity-filter">Rarity</Label>
-          <Select value={filters.rarity} onValueChange={(value) => onFiltersChange({ ...filters, rarity: value })}>
-            <SelectTrigger>
-              <SelectValue placeholder="All rarities" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All rarities</SelectItem>
-              {cardRarities.map((rarity) => (
-                <SelectItem key={rarity.value} value={rarity.value}>
-                  {rarity.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label htmlFor="condition-filter">Condition</Label>
-          <Select
-            value={filters.condition}
-            onValueChange={(value) => onFiltersChange({ ...filters, condition: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="All conditions" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All conditions</SelectItem>
-              {cardConditions.map((condition) => (
-                <SelectItem key={condition.value} value={condition.value}>
-                  {condition.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </CardContent>
-    </Card>
+      <Select value={selectedRarity} onValueChange={onRarityChange}>
+        <SelectTrigger className="w-full sm:w-48">
+          <SelectValue placeholder="All Rarities" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="allRarities">All Rarities</SelectItem>
+          {uniqueRarities.map((rarity) => (
+            <SelectItem key={rarity} value={rarity}>
+              {rarity}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   )
 }

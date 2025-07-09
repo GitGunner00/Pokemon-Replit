@@ -2,78 +2,66 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import type { PokemonCard } from "@/lib/schema"
+import type { PokemonCard } from "@/lib/types"
 
 interface CardDetailsModalProps {
   card: PokemonCard
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  isOpen: boolean
+  onClose: () => void
 }
 
-export function CardDetailsModal({ card, open, onOpenChange }: CardDetailsModalProps) {
+export function CardDetailsModal({ card, isOpen, onClose }: CardDetailsModalProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{card.name}</DialogTitle>
+          <DialogTitle className="text-2xl">{card.name}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
-          {card.imageUrl && (
-            <div className="aspect-[3/4] bg-muted rounded overflow-hidden">
-              <img src={card.imageUrl || "/placeholder.svg"} alt={card.name} className="w-full h-full object-cover" />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <h3 className="font-semibold text-sm text-gray-600 uppercase tracking-wide">Set</h3>
+              <p className="text-lg">{card.set}</p>
             </div>
-          )}
+            <div>
+              <h3 className="font-semibold text-sm text-gray-600 uppercase tracking-wide">Card Number</h3>
+              <p className="text-lg">{card.cardNumber}</p>
+            </div>
+          </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <h4 className="font-medium text-sm text-muted-foreground">Set</h4>
-              <Badge variant="secondary">{card.set}</Badge>
+              <h3 className="font-semibold text-sm text-gray-600 uppercase tracking-wide">Rarity</h3>
+              <Badge variant="secondary" className="mt-1">
+                {card.rarity}
+              </Badge>
             </div>
-
-            {card.number && (
-              <div>
-                <h4 className="font-medium text-sm text-muted-foreground">Number</h4>
-                <p className="text-sm">{card.number}</p>
-              </div>
-            )}
-
             <div>
-              <h4 className="font-medium text-sm text-muted-foreground">Rarity</h4>
-              <p className="text-sm capitalize">{card.rarity.replace("-", " ")}</p>
-            </div>
-
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground">Condition</h4>
-              <p className="text-sm capitalize">{card.condition.replace("-", " ")}</p>
+              <h3 className="font-semibold text-sm text-gray-600 uppercase tracking-wide">Condition</h3>
+              <Badge variant="outline" className="mt-1">
+                {card.condition}
+              </Badge>
             </div>
           </div>
 
-          <Separator />
-
-          <div>
-            <h4 className="font-medium text-sm text-muted-foreground mb-1">Value</h4>
-            <p className="text-2xl font-bold">${card.value}</p>
-          </div>
-
-          {card.notes && (
-            <>
-              <Separator />
-              <div>
-                <h4 className="font-medium text-sm text-muted-foreground mb-2">Notes</h4>
-                <p className="text-sm text-muted-foreground">{card.notes}</p>
-              </div>
-            </>
+          {card.marketValue && (
+            <div>
+              <h3 className="font-semibold text-sm text-gray-600 uppercase tracking-wide">Market Value</h3>
+              <p className="text-2xl font-bold text-green-600">${card.marketValue.toFixed(2)}</p>
+            </div>
           )}
 
-          <Separator />
+          {card.notes && (
+            <div>
+              <h3 className="font-semibold text-sm text-gray-600 uppercase tracking-wide">Notes</h3>
+              <p className="text-gray-800 bg-gray-50 p-3 rounded-md">{card.notes}</p>
+            </div>
+          )}
 
-          <div>
-            <h4 className="font-medium text-sm text-muted-foreground mb-1">Added</h4>
-            <p className="text-sm text-muted-foreground">
-              {card.createdAt ? new Date(card.createdAt).toLocaleDateString() : "Unknown"}
-            </p>
+          <div className="text-sm text-gray-500">
+            <p>Added: {new Date(card.createdAt).toLocaleDateString()}</p>
+            {card.updatedAt !== card.createdAt && <p>Updated: {new Date(card.updatedAt).toLocaleDateString()}</p>}
           </div>
         </div>
       </DialogContent>
